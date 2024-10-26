@@ -66,7 +66,9 @@ typedef enum
 
 /********************** external data definition *****************************/
 
-extern SemaphoreHandle_t hsem_led;
+extern SemaphoreHandle_t hsem_led_red;
+extern SemaphoreHandle_t hsem_led_green;
+extern SemaphoreHandle_t hsem_led_blue;
 
 /********************** internal functions definition ************************/
 
@@ -79,20 +81,27 @@ void led_set_colors(bool r, bool g, bool b)
 
 /********************** external functions definition ************************/
 
+
 void task_led(void *argument)
 {
   while (true)
   {
     led_color_t color;
 
-    if(pdTRUE == xSemaphoreTake(hsem_led, 0))
+    if(pdTRUE == xSemaphoreTake(hsem_led_red, 0))
     {
-      color = LED_COLOR_RED;
+    	color = LED_COLOR_RED;
     }
-    else
+    else if (pdTRUE == xSemaphoreTake(hsem_led_green, 0))
     {
-      color = LED_COLOR_NONE;
-    }
+    	color = LED_COLOR_GREEN;
+    } else if (pdTRUE == xSemaphoreTake(hsem_led_blue, 0))
+    {
+    	color = LED_COLOR_BLUE;
+    } else
+	{
+    	color = LED_COLOR_NONE;
+	}
 
     switch (color)
     {

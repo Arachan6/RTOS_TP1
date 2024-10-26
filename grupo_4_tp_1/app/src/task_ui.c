@@ -54,8 +54,13 @@
 
 /********************** external data definition *****************************/
 
-extern SemaphoreHandle_t hsem_button;
-extern SemaphoreHandle_t hsem_led;
+extern SemaphoreHandle_t hsem_button_pulse;
+extern SemaphoreHandle_t hsem_button_short;
+extern SemaphoreHandle_t hsem_button_long;
+
+extern SemaphoreHandle_t hsem_led_red;
+extern SemaphoreHandle_t hsem_led_green;
+extern SemaphoreHandle_t hsem_led_blue;
 
 /********************** internal functions definition ************************/
 
@@ -65,10 +70,22 @@ void task_ui(void *argument)
 {
   while (true)
   {
-    if(pdTRUE == xSemaphoreTake(hsem_button, portMAX_DELAY))
+    if(pdTRUE == xSemaphoreTake(hsem_button_pulse, 0))
     {
-      LOGGER_INFO("ui led activate");
-      xSemaphoreGive(hsem_led);
+      LOGGER_INFO("ui led red activate");
+      xSemaphoreGive(hsem_led_red);
+    }
+
+    if(pdTRUE == xSemaphoreTake(hsem_button_short, 0))
+    {
+      LOGGER_INFO("ui led green activate");
+      xSemaphoreGive(hsem_led_green);
+    }
+
+    if(pdTRUE == xSemaphoreTake(hsem_button_long, 0))
+    {
+      LOGGER_INFO("ui led blue activate");
+      xSemaphoreGive(hsem_led_blue);
     }
   }
 }

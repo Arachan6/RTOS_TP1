@@ -61,7 +61,9 @@
 
 /********************** external data definition *****************************/
 
-extern SemaphoreHandle_t hsem_button;
+extern SemaphoreHandle_t hsem_button_pulse;
+extern SemaphoreHandle_t hsem_button_short;
+extern SemaphoreHandle_t hsem_button_long;
 
 /********************** internal functions definition ************************/
 
@@ -111,39 +113,73 @@ static button_type_t button_process_state_(bool value)
 }
 
 /********************** external functions definition ************************/
-
 void task_button(void* argument)
 {
-  button_init_();
+	button_init_();
 
-  while(true)
-  {
-    GPIO_PinState button_state;
-    button_state = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
+	while(true)
+	{
 
-    button_type_t button_type;
-    button_type = button_process_state_(button_state);
+		GPIO_PinState button_state;
+		button_state = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
 
-    switch (button_type) {
-      case BUTTON_TYPE_NONE:
-        break;
-      case BUTTON_TYPE_PULSE:
-        LOGGER_INFO("button pulse");
-        xSemaphoreGive(hsem_button);
-        break;
-      case BUTTON_TYPE_SHORT:
-        LOGGER_INFO("button short");
-        break;
-      case BUTTON_TYPE_LONG:
-        LOGGER_INFO("button long");
-        break;
-      default:
-        LOGGER_INFO("button error");
-        break;
-    }
+		button_type_t button_type;
+		button_type = button_process_state_(button_state);
 
-    vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
-  }
+		ao_button_send(button_type);
+
+		vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
+
+	}
+}
+
+void ao_button_init ()
+{
+	hsem_button_pulse = xSemaphoreCreateBinary();
+	hsem_button_short = xSemaphoreCreateBinary();
+	hsem_button_long = xSemaphoreCreateBinary();
+
+	configASSERT(NULL != hsem_button_pulse);
+	configASSERT(NULL != hsem_button_short);
+	configASSERT(NULL != hsem_button_long);
+
+	vQueueAddToRegistry(hsem_button_pulse, "Pulse Semaphore");
+	vQueueAddToRegistry(hsem_button_short, "Short Semaphore");
+	vQueueAddToRegistry(hsem_button_long, "Long Semaphore");
+
+	BaseType_t status;
+
+	status = xTaskCreate(task_button, "task_button", 128, NULL, tskIDLE_PRIORITY, NULL);
+	configASSERT(pdPASS == status);
+}
+
+void ao_button_send (button_type_t button_type)
+{
+	switch (button_type)
+	{
+	  case BUTTON_TYPE_NONE:
+
+		break;
+
+	  case BUTTON_TYPE_PULSE:
+		LOGGER_INFO("button pulse");
+		xSemaphoreGive(hsem_button_pulse);
+		break;
+
+	  case BUTTON_TYPE_SHORT:
+		LOGGER_INFO("button short");
+		xSemaphoreGive(hsem_button_short);
+		break;
+
+	  case BUTTON_TYPE_LONG:
+		LOGGER_INFO("button long");
+		xSemaphoreGive(hsem_button_long);
+		break;
+
+	  default:
+		LOGGER_INFO("button error");
+		break;
+	}
 }
 
 /********************** end of file ******************************************/
