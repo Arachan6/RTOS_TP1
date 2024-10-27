@@ -80,56 +80,109 @@ void led_set_colors(bool r, bool g, bool b)
 }
 
 /********************** external functions definition ************************/
+bool ao_led_red_receive ()
+{
+	return (pdTRUE == xSemaphoreTake(hsem_led_red, 0));
+}
 
+bool ao_led_green_receive ()
+{
+	return (pdTRUE == xSemaphoreTake(hsem_led_green, 0));
+}
 
-void task_led(void *argument)
+bool ao_led_blue_receive ()
+{
+	return (pdTRUE == xSemaphoreTake(hsem_led_blue, 0));
+}
+
+void task_led_red(void *argument)
 {
   while (true)
   {
-    led_color_t color;
+	  if (ao_led_red_receive())
+	  {
+		LOGGER_INFO("led red");
+		led_set_colors(true, false, false);
+	  } else
+	  {
+		led_set_colors(false, false, false);
+	  }
 
-    if(pdTRUE == xSemaphoreTake(hsem_led_red, 0))
-    {
-    	color = LED_COLOR_RED;
-    }
-    else if (pdTRUE == xSemaphoreTake(hsem_led_green, 0))
-    {
-    	color = LED_COLOR_GREEN;
-    } else if (pdTRUE == xSemaphoreTake(hsem_led_blue, 0))
-    {
-    	color = LED_COLOR_BLUE;
-    } else
-	{
-    	color = LED_COLOR_NONE;
-	}
-
-    switch (color)
-    {
-      case LED_COLOR_NONE:
-        led_set_colors(false, false, false);
-        break;
-      case LED_COLOR_RED:
-        LOGGER_INFO("led red");
-        led_set_colors(true, false, false);
-        break;
-      case LED_COLOR_GREEN:
-        LOGGER_INFO("led green");
-        led_set_colors(false, true, false);
-        break;
-      case LED_COLOR_BLUE:
-        LOGGER_INFO("led blue");
-        led_set_colors(false, false, true);
-        break;
-      case LED_COLOR_WHITE:
-        LOGGER_INFO("led white");
-        led_set_colors(true, true, true);
-        break;
-      default:
-        break;
-    }
-
-    vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
+	vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
   }
+}
+
+void task_led_green(void *argument)
+{
+  while (true)
+  {
+	  if (ao_led_green_receive())
+	  {
+		LOGGER_INFO("led green");
+		led_set_colors(false, true, false);
+	  } else
+	  {
+		led_set_colors(false, false, false);
+	  }
+
+	vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
+  }
+}
+
+void task_led_blue(void *argument)
+{
+  while (true)
+  {
+	  if (ao_led_blue_receive())
+	  {
+		LOGGER_INFO("led blue");
+		led_set_colors(false, false, true);
+	  } else
+	  {
+		led_set_colors(false, false, false);
+	  }
+
+	vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
+  }
+}
+
+void ao_led_red_init ()
+{
+	hsem_led_red = xSemaphoreCreateBinary();
+
+	configASSERT(NULL != hsem_led_red);
+
+	vQueueAddToRegistry(hsem_led_red, "Red Semaphore");
+
+	BaseType_t status;
+	status = xTaskCreate(task_led_red, "task_led_red", 128, NULL, tskIDLE_PRIORITY, NULL);
+	configASSERT(pdPASS == status);
+}
+
+void ao_led_green_init ()
+{
+	hsem_led_green = xSemaphoreCreateBinary();
+
+	configASSERT(NULL != hsem_led_green);
+
+	vQueueAddToRegistry(hsem_led_green, "Green Semaphore");
+
+	BaseType_t status;
+	status = xTaskCreate(task_led_green, "task_led_green", 128, NULL, tskIDLE_PRIORITY, NULL);
+	configASSERT(pdPASS == status);
+}
+
+void ao_led_blue_init ()
+{
+	hsem_led_blue = xSemaphoreCreateBinary();
+
+	configASSERT(NULL != hsem_led_blue);
+
+	vQueueAddToRegistry(hsem_led_blue, "Blue Semaphore");
+
+	BaseType_t status;
+	status = xTaskCreate(task_led_blue, "task_led_blue", 128, NULL, tskIDLE_PRIORITY, NULL);
+	configASSERT(pdPASS == status);
 }
 
 /********************** end of file ******************************************/

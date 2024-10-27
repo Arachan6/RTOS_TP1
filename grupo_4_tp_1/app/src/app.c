@@ -68,24 +68,13 @@ void app_init(void)
 {
 	ao_button_init();
 
-	hsem_led_red = xSemaphoreCreateBinary();
-	hsem_led_green = xSemaphoreCreateBinary();
-	hsem_led_blue = xSemaphoreCreateBinary();
-
-	configASSERT(NULL != hsem_led_red);
-	configASSERT(NULL != hsem_led_green);
-	configASSERT(NULL != hsem_led_blue);
-
-	vQueueAddToRegistry(hsem_led_red, "Red Semaphore");
-	vQueueAddToRegistry(hsem_led_green, "Green Semaphore");
-	vQueueAddToRegistry(hsem_led_blue, "Blue Semaphore");
+	ao_led_red_init ();
+	ao_led_green_init ();
+	ao_led_blue_init ();
 
 	BaseType_t status;
 
 	status = xTaskCreate(task_ui, "task_ui", 128, NULL, tskIDLE_PRIORITY, NULL);
-	configASSERT(pdPASS == status);
-
-	status = xTaskCreate(task_led, "task_led", 128, NULL, tskIDLE_PRIORITY, NULL);
 	configASSERT(pdPASS == status);
 
 	LOGGER_INFO("app init");
