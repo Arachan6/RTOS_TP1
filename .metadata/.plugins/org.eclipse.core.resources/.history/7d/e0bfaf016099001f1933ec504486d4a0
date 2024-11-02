@@ -1,0 +1,76 @@
+/*
+ * task_red_led.c
+ *
+ *  Created on: Nov 2, 2024
+ *      Author: felipe
+ */
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "main.h"
+#include "cmsis_os.h"
+#include "board.h"
+#include "logger.h"
+#include "dwt.h"
+
+#include "task_red_led.h"
+
+/********************** macros and definitions *******************************/
+
+#define TASK_PERIOD_MS_           (1000)
+
+/********************** internal data declaration ****************************/
+
+/********************** internal functions declaration ***********************/
+
+/********************** internal data definition *****************************/
+
+typedef enum
+{
+  LED_COLOR_NONE,
+  LED_COLOR_RED,
+  LED_COLOR_GREEN,
+  LED_COLOR_BLUE,
+  LED_COLOR_WHITE,
+  LED_COLOR__N,
+} led_color_t;
+
+/********************** external data definition *****************************/
+
+
+/********************** internal functions definition ************************/
+
+void led_set_colors(bool r, bool g, bool b)
+{
+  HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, r ? GPIO_PIN_SET: GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, g ? GPIO_PIN_SET: GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_BLUE_PORT, LED_BLUE_PIN, b ? GPIO_PIN_SET: GPIO_PIN_RESET);
+}
+
+/********************** external functions definition ************************/
+bool ao_red_led_send ()
+{
+	return (pdTRUE == xSemaphoreTake(hsem_led_red, 0));
+}
+
+
+
+void task_red_led(ao_led_handle_t *hao, ao_led_message_t msg){
+	return (pdPASS == xQueueSend(hao->hqueue, (void *)&msg, 0));
+}
+
+void ao_red_led_init (ao_led_handle_t *hrao){
+	hao->hqueue = xQueueCreate(QUEUE_LENGTH_, QUEUE_ITEM_SIZE_);
+	while (NULL == hao->hqueue){}
+
+	BaseType_t status;
+	status = xTaskCreate(task_red_led, "task_ao_red_led", 128, (void *const)hao, tskIDLE_PRIORITY, NULL);
+	configASSERT(pdPASS == status);
+
+}
+
+
+
+/********************** end of file ******************************************/

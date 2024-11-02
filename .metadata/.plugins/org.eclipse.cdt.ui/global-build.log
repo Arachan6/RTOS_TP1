@@ -1,0 +1,67 @@
+19:43:17 **** Incremental Build of configuration Debug for project grupo_4_tp_1 ****
+make -j4 all 
+arm-none-eabi-gcc "../app/src/task_blue_led.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F429xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../app/inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"app/src/task_blue_led.d" -MT"app/src/task_blue_led.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "app/src/task_blue_led.o"
+arm-none-eabi-gcc "../app/src/task_green_led.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F429xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../app/inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"app/src/task_green_led.d" -MT"app/src/task_green_led.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "app/src/task_green_led.o"
+arm-none-eabi-gcc "../app/src/task_red_led.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F429xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../app/inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"app/src/task_red_led.d" -MT"app/src/task_red_led.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "app/src/task_red_led.o"
+arm-none-eabi-gcc "../app/src/task_ui.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F429xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../app/inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"app/src/task_ui.d" -MT"app/src/task_ui.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "app/src/task_ui.o"
+In file included from ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:59,
+                 from ../app/src/task_green_led.c:6:
+../app/src/task_green_led.c: In function 'ao_green_led_send':
+In file included from ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:59,
+                 from ../app/src/task_red_led.c:6:
+../app/src/task_red_led.c: In function 'ao_red_led_send':
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:479:90: warning: passing argument 2 of 'xQueueGenericSend' makes pointer from integer without a cast [-Wint-conversion]
+  479 | #define xQueueSend( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
+      |                                                                                          ^~~~~~~~~~~~~~~~~
+      |                                                                                          |
+      |                                                                                          int
+../app/src/task_red_led.c:18:27: note: in expansion of macro 'xQueueSend'
+   18 |         return (pdPASS == xQueueSend(hrao->hrqueue, true, 0));
+      |                           ^~~~~~~~~~
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:479:90: warning: passing argument 2 of 'xQueueGenericSend' makes pointer from integer without a cast [-Wint-conversion]
+  479 | #define xQueueSend( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
+      |                                                                                          ^~~~~~~~~~~~~~~~~
+      |                                                                                          |
+      |                                                                                          int
+../app/src/task_green_led.c:18:27: note: in expansion of macro 'xQueueSend'
+   18 |         return (pdPASS == xQueueSend(hgao->hgqueue, true, 0));
+      |                           ^~~~~~~~~~
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:650:72: note: expected 'const void * const' but argument is of type 'int'
+  650 | BaseType_t xQueueGenericSend( QueueHandle_t xQueue, const void * const pvItemToQueue, TickType_t xTicksToWait, const BaseType_t xCopyPosition ) PRIVILEGED_FUNCTION;
+      |                                                     ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:650:72: note: expected 'const void * const' but argument is of type 'int'
+  650 | BaseType_t xQueueGenericSend( QueueHandle_t xQueue, const void * const pvItemToQueue, TickType_t xTicksToWait, const BaseType_t xCopyPosition ) PRIVILEGED_FUNCTION;
+      |                                                     ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+In file included from ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:59,
+                 from ../app/src/task_blue_led.c:6:
+../app/src/task_blue_led.c: In function 'ao_blue_led_send':
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:479:90: warning: passing argument 2 of 'xQueueGenericSend' makes pointer from integer without a cast [-Wint-conversion]
+  479 | #define xQueueSend( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
+      |                                                                                          ^~~~~~~~~~~~~~~~~
+      |                                                                                          |
+      |                                                                                          int
+../app/src/task_blue_led.c:18:27: note: in expansion of macro 'xQueueSend'
+   18 |         return (pdPASS == xQueueSend(hbao->hbqueue, true, 0));
+      |                           ^~~~~~~~~~
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:650:72: note: expected 'const void * const' but argument is of type 'int'
+  650 | BaseType_t xQueueGenericSend( QueueHandle_t xQueue, const void * const pvItemToQueue, TickType_t xTicksToWait, const BaseType_t xCopyPosition ) PRIVILEGED_FUNCTION;
+      |                                                     ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "grupo_4_tp_1.elf" @"objects.list"  -lrdimon -mcpu=cortex-m4 -T"/home/felipe/Desktop/RTOS_TP1/grupo_4_tp_1/STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="grupo_4_tp_1.map" -Wl,--gc-sections -static -specs=rdimon.specs --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+/opt/st/stm32cubeide_1.15.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.linux64_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld: warning: grupo_4_tp_1.elf has a LOAD segment with RWX permissions
+Finished building target: grupo_4_tp_1.elf
+ 
+arm-none-eabi-size  grupo_4_tp_1.elf 
+arm-none-eabi-objdump -h -S grupo_4_tp_1.elf  > "grupo_4_tp_1.list"
+   text	   data	    bss	    dec	    hex	filename
+  33052	    124	  19908	  53084	   cf5c	grupo_4_tp_1.elf
+Finished building: default.size.stdout
+ 
+Finished building: grupo_4_tp_1.list
+ 
+19:43:21 **** Incremental Build of configuration Debug for project grupo_4_tp_1 ****
+make -j4 all 
+arm-none-eabi-size  grupo_4_tp_1.elf 
+   text	   data	    bss	    dec	    hex	filename
+  33052	    124	  19908	  53084	   cf5c	grupo_4_tp_1.elf
+Finished building: default.size.stdout
+ 

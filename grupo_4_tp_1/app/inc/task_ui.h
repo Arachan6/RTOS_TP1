@@ -42,15 +42,22 @@ extern "C" {
 
 /********************** inclusions *******************************************/
 
+#include "task_button.h"
+
 /********************** macros ***********************************************/
 
 /********************** typedef **********************************************/
+
+typedef struct{
+	QueueHandle_t hqueue;
+} ao_ui_handle_t;
 
 /********************** external data declaration ****************************/
 
 /********************** external functions declaration ***********************/
 
-void task_ui(void* argument);
+void ao_ui_init(ao_ui_handle_t* hao);
+bool ao_ui_send(ao_ui_handle_t* hao, button_type_t button_press_type);
 
 /********************** End of CPP guard *************************************/
 #ifdef __cplusplus

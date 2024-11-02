@@ -1,39 +1,3 @@
-/*
- * Copyright (c) 2023 Sebastian Bedin <sebabedin@gmail.com>.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @author : Sebastian Bedin <sebabedin@gmail.com>
- */
-
-/********************** inclusions *******************************************/
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -44,50 +8,56 @@
 #include "logger.h"
 #include "dwt.h"
 
-/********************** macros and definitions *******************************/
+#include "task_ui.h"
+#include "task_button.h"
+#include "task_red_led.h"
+#include "task_green_led.h"
+#include "task_blue_led.h"
 
-/********************** internal data declaration ****************************/
+#define AO_UI_QUEUE_LENGTH_    (5)
+#define AO_UI_QUEUE_ITEM_SIZE_ (sizeof(button_type_t))
 
-/********************** internal functions declaration ***********************/
+extern ao_red_led_handle_t ao_red_led_h;
+extern ao_green_led_handle_t ao_green_led_h;
+extern ao_blue_led_handle_t ao_blue_led_h;
 
-/********************** internal data definition *****************************/
+void task_ui(void *argument){
+	ao_ui_handle_t *huiao = (ao_ui_handle_t *)argument;
+	button_type_t button_press_type;
 
-/********************** external data definition *****************************/
-
-extern SemaphoreHandle_t hsem_button_pulse;
-extern SemaphoreHandle_t hsem_button_short;
-extern SemaphoreHandle_t hsem_button_long;
-
-extern SemaphoreHandle_t hsem_led_red;
-extern SemaphoreHandle_t hsem_led_green;
-extern SemaphoreHandle_t hsem_led_blue;
-
-/********************** internal functions definition ************************/
-
-/********************** external functions definition ************************/
-
-void task_ui(void *argument)
-{
-  while (true)
-  {
-    if(pdTRUE == xSemaphoreTake(hsem_button_pulse, 0))
-    {
-      LOGGER_INFO("ui led red activate");
-      xSemaphoreGive(hsem_led_red);
-    }
-
-    if(pdTRUE == xSemaphoreTake(hsem_button_short, 0))
-    {
-      LOGGER_INFO("ui led green activate");
-      xSemaphoreGive(hsem_led_green);
-    }
-
-    if(pdTRUE == xSemaphoreTake(hsem_button_long, 0))
-    {
-      LOGGER_INFO("ui led blue activate");
-      xSemaphoreGive(hsem_led_blue);
-    }
-  }
+	while (true){
+		if (pdTRUE == xQueueReceive(huiao->hqueue, (void *)&button_press_type, portMAX_DELAY)){
+			switch (button_press_type){
+				case BUTTON_TYPE_PULSE:
+					LOGGER_INFO("UI red led blink");
+					ao_red_led_send(&ao_red_led_h);
+					break;
+				case BUTTON_TYPE_SHORT:
+					LOGGER_INFO("UI green led blink");
+					ao_green_led_send(&ao_green_led_h);
+					break;
+				case BUTTON_TYPE_LONG:
+					LOGGER_INFO("UI blue led blink");
+					ao_blue_led_send(&ao_blue_led_h);
+					break;
+				default:
+					LOGGER_INFO("Unknown event for UI object");
+					break;
+			}
+		}
+	}
 }
 
-/********************** end of file ******************************************/
+bool ao_ui_send(ao_ui_handle_t *hao, button_type_t btn_press_type){
+    return (pdPASS == xQueueSend(hao->hqueue, (void *)&btn_press_type, 0));
+}
+
+void ao_ui_init(ao_ui_handle_t *hao){
+    hao->hqueue = xQueueCreate(AO_UI_QUEUE_LENGTH_, AO_UI_QUEUE_ITEM_SIZE_);
+    while (NULL == hao->hqueue){}
+
+    BaseType_t status;
+    status = xTaskCreate(task_ui, "task_ao_ui", 128, (void*)hao, tskIDLE_PRIORITY, NULL);
+    configASSERT(pdPASS == status);
+}
+

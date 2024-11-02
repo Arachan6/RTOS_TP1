@@ -1,0 +1,10 @@
+19:25:09 **** Build of configuration Debug for project freertos_app_example_4_6 ****
+make -j4 all 
+arm-none-eabi-size  freertos_app_example_4_6.elf 
+   text	   data	    bss	    dec	    hex	filename
+  28188	    216	  19912	  48316	   bcbc	freertos_app_example_4_6.elf
+Finished building: default.size.stdout
+ 
+
+19:25:09 Build Finished. 0 errors, 0 warnings. (took 647ms)
+

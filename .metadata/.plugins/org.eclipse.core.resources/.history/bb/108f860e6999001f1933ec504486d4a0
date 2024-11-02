@@ -1,0 +1,34 @@
+#include "main.h"
+#include "cmsis_os.h"
+#include "logger.h"
+#include "dwt.h"
+#include "board.h"
+
+#include "task_button.h"
+#include "task_red_led.h"
+#include "task_green_led.h"
+#include "task_blue_led.h"
+#include "task_ui.h"
+
+ao_red_led_handle_t ao_red_led_h;
+ao_green_led_handle_t ao_green_led_h;
+ao_blue_led_handle_t ao_blue_led_h;
+
+ao_ui_handle_t ao_ui;
+
+void app_init(void){
+	ao_button_init();
+
+	ao_led_red_init ();
+	ao_led_green_init ();
+	ao_led_blue_init ();
+
+	BaseType_t status;
+
+	status = xTaskCreate(task_ui, "task_ui", 128, NULL, tskIDLE_PRIORITY, NULL);
+	configASSERT(pdPASS == status);
+
+	LOGGER_INFO("app init");
+
+	cycle_counter_init();
+}
